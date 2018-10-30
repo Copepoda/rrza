@@ -62,7 +62,7 @@ The package `devtools` is needed install the `rrza` package.
 
 ``` r
 library(devtools)
-devtools::install_git("git@gitlab.afsc.noaa.gov:Nissa.Ferm/FastrCAT/FastrCAT.git",
+devtools::install_git("git@gitlab.afsc.noaa.gov:Nissa.Ferm/rrza.git",
                       build_vignettes = TRUE,
                       credentials = creds)
 ```
