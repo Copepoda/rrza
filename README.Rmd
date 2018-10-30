@@ -70,7 +70,7 @@ creds <- git2r::cred_ssh_key(publickey = ssh_path("id_rsa.pub"),
 The package `devtools` is needed install the `rrza` package. 
 ```{r, eval = FALSE}
 library(devtools)
-devtools::install_git("git@gitlab.afsc.noaa.gov:Nissa.Ferm/FastrCAT/FastrCAT.git",
+devtools::install_git("git@gitlab.afsc.noaa.gov:Nissa.Ferm/rrza.git",
                       build_vignettes = TRUE,
                       credentials = creds)
 ```
