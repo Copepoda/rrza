@@ -245,10 +245,10 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
                               rza_taxa[i], ".png", sep = "")
 
 
-      breaks <- as.integer(range(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
+      breaks <- range(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                                         filter(EST_NUM_PERM3 > 0)%>%
                                         collect %$% as.vector(log10(EST_NUM_PERM3)),
-                                      na.rm = TRUE))
+                                      na.rm = TRUE)
 
       taxa_breaks <- if(sum(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                             collect %$% as.vector(EST_NUM_PERM3),na.rm = TRUE) == 0){
@@ -257,8 +257,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
                     }else if(abs(diff(breaks)) == 0){
 
-                      taxa_breaks <- seq(from = breaks[1] - 1,
-                                         to = breaks[2] + 1, by = 1 )
+                      taxa_breaks <- breaks[1]
 
                     }else if(abs(diff(breaks)) > 1){
 
@@ -283,11 +282,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
                             size = 6, show.legend = TRUE,
                    data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 > 0))+
-        viridis::scale_color_viridis(option = "viridis",
+        ggplot2::scale_color_viridis_c(option = "viridis",
                                      name = expression(paste("# ","m"^"-3")),
                             breaks = taxa_breaks,
-                            labels = format(signif(10^taxa_breaks, digits = 1),
-                                     scientific = FALSE, trim = TRUE))+
+                            labels = signif(10^taxa_breaks, digits = 1)
+                            )+
         ggplot2::scale_x_continuous(breaks = seq(region_xlim[1],
                                                  (region_xlim[2] - 2), by = 4))+
         ggplot2::scale_y_continuous(breaks = seq(region_ylim[1],
