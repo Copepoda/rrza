@@ -120,9 +120,10 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
 # path to where the plots will be written--------------------------------------
 
+  remove <- length(stringr::str_count(unlist(stringr::str_split(rza_path,"/"))))
+
   folder_path <- stringr::str_c(unlist(stringr::str_split(
-      rza_path,"/"))[-length(stringr::str_count(
-        unlist(stringr::str_split(rza_path,"/"))))], collapse = "/")
+      rza_path,"/"))[-c(remove -1, remove)], collapse = "/")
 
   plot_path <- paste(folder_path, "Plots/", sep = "/")
 
@@ -219,15 +220,15 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
                           nrow = 3)
 
 
-    png(filename = name_20BON_plot, width = 1200, height = 400, units = "px",
-        bg = "transparent")
+    grDevices::png(filename = name_20BON_plot, width = 1200,
+                   height = 400, units = "px", bg = "transparent")
 
     print(plot_20bon)
 
     dev.off()
 
-    png(filename = name_60BON_plot, width = 1200, height = 1200, units = "px",
-        bg = "transparent")
+    grDevices::png(filename = name_60BON_plot, width = 1200,
+                   height = 1200, units = "px", bg = "transparent")
 
     print(plot_60bon)
 
@@ -242,36 +243,6 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       name_taxa_plot <- paste(plot_path,"RZA_",unique(rza$CRUISE), "_",
                               rza_taxa[i], ".png", sep = "")
 
-      #For TESTING###
-      #i <- 1
-      #Check to see if the EST_NUM_PERM3 needs to be logged.
-      #max_est <- RZA %>% filter(RZA_TAXA == rza_taxa[i]) %>%
-        #collect %$% as.vector(EST_NUM_PERM3)
-
-      #EST_color <- if(log_override == FALSE & max(max_est, na.rm = TRUE) > 50){
-      #  "log10(EST_NUM_PERM3)"
-     # }else if(log_override == FALSE & max(max_est, na.rm = TRUE) < 50){
-       # "EST_NUM_PERM3"
-     # }else if(log_override == TRUE & log_all == FALSE){
-      #  "EST_NUM_PERM3"
-     # }else{
-      #  "log10(EST_NUM_PERM3)"
-      #  }
-
-
-      #Legend_name <- if(log_override == FALSE & max(max_est, na.rm = TRUE) > 50){
-      #  expression(paste("#","m"^"-3"))
-     # }else if (log_override == FALSE & max(max_est, na.rm = TRUE) < 50){
-      #  expression(paste("#","m"^"-3"))
-      #}else if (log_override == TRUE & log_all == FALSE){
-      #  expression(paste("#","m"^"-3"))
-     # }else {
-     #   expression(paste("#","m"^"-3")) #remember is using these variables use aes_sting
-     # }
-
-
-      png(filename = name_taxa_plot, width = 400, height = 400, units = "px",
-          bg = "transparent")
 
       breaks <- as.integer(range(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                                         filter(EST_NUM_PERM3 > 0)%>%
@@ -329,6 +300,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
           legend.text = element_text(face = "bold", size = 16),
           legend.position = "right",
           strip.background = element_blank())
+
+
+
+      grDevices::png(filename = name_taxa_plot,
+                     width = 400, height = 400, units = "px",bg = "transparent")
 
       print(rza_plot)
 
