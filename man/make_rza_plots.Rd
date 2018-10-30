@@ -4,10 +4,12 @@
 \alias{make_rza_plots}
 \title{Abundance Maps for Rapid Zooplankton Assesment taxa.}
 \usage{
-make_rza_plots(RZA, region, facets = TRUE, Year_folder, Cruise_folder)
+make_rza_plots(rza_path, region, facets = TRUE)
 }
 \arguments{
-\item{RZA}{An .xlxs dataframe formated specifically for entry of RZA data.}
+\item{rza_path}{The path to the directory where the .xlxs rza dataframe
+is located along with the .xlxs file name. This is a dataframe specifically
+formated for rza data entry.}
 
 \item{region}{There are six geographic regions which produce standardized
 maps. The six standardized maps can be set to Arctic, Northern BS, 70 meter,
@@ -17,12 +19,9 @@ BASIS, GOA, and MACE 2018.}
 function will produce two sets of faceted maps. One of the 60 bongo rza
 taxa and one of the 20 bongo rza taxa. When facets is set to FALSE the
 function will produce a map for each rza taxa.}
-
-\item{Year_folder}{The name of the year folder where the rza dataframe
-is located.}
-
-\item{Cruise_folder}{The name of the cruise folder where the rza
-dataframe is located.}
+}
+\value{
+Either faceted maps or individual maps of rza taxa abundance.
 }
 \description{
 This function takes an RZA .xlxs dataframe and will make either

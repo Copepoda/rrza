@@ -142,23 +142,30 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       collect %$% as.vector(log10(EST_NUM_PERM3)), na.rm = TRUE))
 
 
-    Plot_20BON <- ggplot()+
-      geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
-      geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
-      coord_sf(xlim = region_xlim, ylim = region_ylim)+
-      geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                 data = rza %>% filter(GEAR_NAME == "20BON") %>% filter(EST_NUM_PERM3 > 0))+
-      geom_point(aes(LON,LAT), size = 4, shape = 4,
-                 data = rza %>% filter(GEAR_NAME == "20BON") %>% filter(EST_NUM_PERM3 == 0))+
-      scale_color_viridis(option = "viridis", name = expression(paste("# ","m"^"-3")),
-                          breaks = c(seq(from = breaks_20[1], to = breaks_20[2], by = 1)),
-                          labels = c(10^seq(from = breaks_20[1], to = breaks_20[2], by = 1)))+
-      scale_x_continuous(breaks = seq(region_xlim[1],(region_xlim[2] - 2), by = 4))+
-      scale_y_continuous(breaks = seq(region_ylim[1],region_ylim[2], by = 2))+
-      theme_bw()+
-      xlab(label = "Longitude")+
-      ylab(label = "Latitude")+
-      theme(
+    plot_20bon <- ggplot2::ggplot()+
+      ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
+      ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
+      ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
+      ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
+                 data = rza %>% filter(GEAR_NAME == "20BON") %>%
+                   filter(EST_NUM_PERM3 > 0))+
+      ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
+                 data = rza %>% filter(GEAR_NAME == "20BON") %>%
+                   filter(EST_NUM_PERM3 == 0))+
+      viridis::scale_color_viridis(option = "viridis",
+                                   name = expression(paste("# ","m"^"-3")),
+                                   breaks = c(seq(from = breaks_20[1],
+                                         to = breaks_20[2], by = 1)),
+                                   labels = c(10^seq(from = breaks_20[1],
+                                            to = breaks_20[2], by = 1)))+
+      ggplot2::scale_x_continuous(breaks = seq(region_xlim[1],
+                                               (region_xlim[2] - 2), by = 4))+
+      ggplot2::scale_y_continuous(breaks = seq(region_ylim[1],
+                                               region_ylim[2], by = 2))+
+      ggplot2::theme_bw()+
+      ggplot2::xlab(label = "Longitude")+
+      ggplot2::ylab(label = "Latitude")+
+      ggplot2::theme(
         axis.text.y = element_text(face = "bold", size = 12),
         axis.text.x = element_text(face = "bold", size = 12),
         axis.title = element_text(face = "bold", size = 18),
@@ -166,30 +173,41 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         legend.title = element_text(face = "bold",size = 16),
         legend.text = element_text(face = "bold", size = 16),
         strip.background = element_blank())+
-      facet_wrap(~ RZA_TAXA,labeller = labeller(RZA_TAXA = RZA_taxa_names),nrow = 1)
+      ggplot2::facet_wrap(~ RZA_TAXA,
+                          labeller = labeller(RZA_TAXA = RZA_taxa_names),
+                          nrow = 1)
 
 
     breaks_60 <- as.integer(range(rza %>% filter(GEAR_NAME == "60BON") %>%
                                     filter(EST_NUM_PERM3 > 0)%>%
-                                    collect %$% as.vector(log10(EST_NUM_PERM3)), na.rm = TRUE))
+                                    collect %$%
+                                    as.vector(log10(EST_NUM_PERM3)),
+                                    na.rm = TRUE))
 
-    Plot_60BON <- ggplot()+
-      geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
-      geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
-      coord_sf(xlim = region_xlim, ylim = region_ylim)+
-      geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                 data = rza %>% filter(GEAR_NAME == "60BON") %>% filter(EST_NUM_PERM3 > 0))+
-      geom_point(aes(LON,LAT), size = 4, shape = 4,
-                 data = rza %>% filter(GEAR_NAME == "60BON") %>% filter(EST_NUM_PERM3 == 0))+
-      scale_color_viridis(option = "viridis", name = expression(paste("# ","m"^"-3")),
-                          breaks = c(seq(from = breaks_60[1], to = breaks_60[2], by = 1)),
-                          labels = c(10^seq(from = breaks_60[1], to = breaks_60[2], by = 1)))+
-      scale_x_continuous(breaks = seq(region_xlim[1],(region_xlim[2] - 2), by = 4))+
-      scale_y_continuous(breaks = seq(region_ylim[1],region_ylim[2], by = 2))+
-      theme_bw()+
-      xlab(label = "Longitude")+
-      ylab(label = "Latitude")+
-      theme(
+    plot_60bon <- ggplot2::ggplot()+
+      ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
+      ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
+      ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
+      ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
+                 data = rza %>% filter(GEAR_NAME == "60BON") %>%
+                   filter(EST_NUM_PERM3 > 0))+
+      ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
+                 data = rza %>% filter(GEAR_NAME == "60BON") %>%
+                   filter(EST_NUM_PERM3 == 0))+
+      viridis::scale_color_viridis(option = "viridis",
+                                   name = expression(paste("# ","m"^"-3")),
+                          breaks = c(seq(from = breaks_60[1],
+                                         to = breaks_60[2], by = 1)),
+                          labels = c(10^seq(from = breaks_60[1],
+                                         to = breaks_60[2], by = 1)))+
+      ggplot2::scale_x_continuous(breaks = seq(region_xlim[1],
+                                               (region_xlim[2] - 2), by = 4))+
+      ggplot2::scale_y_continuous(breaks = seq(region_ylim[1],
+                                               region_ylim[2], by = 2))+
+      ggplot2::theme_bw()+
+      ggplot2::xlab(label = "Longitude")+
+      ggplot2::ylab(label = "Latitude")+
+      ggplot2::theme(
         axis.text.y = element_text(face = "bold", size = 12),
         axis.text.x = element_text(face = "bold", size = 12),
         axis.title = element_text(face = "bold", size = 18),
@@ -197,20 +215,22 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         legend.title = element_text(face = "bold",size = 16),
         legend.text = element_text(face = "bold", size = 16),
         strip.background = element_blank())+
-      facet_wrap(~RZA_TAXA,labeller = labeller(RZA_TAXA = RZA_taxa_names),nrow = 3)
+      ggplot2::facet_wrap(~RZA_TAXA,
+                          labeller = labeller(RZA_TAXA = RZA_taxa_names),
+                          nrow = 3)
 
 
     png(filename = name_20BON_plot, width = 1200, height = 400, units = "px",
         bg = "transparent")
 
-    print(Plot_20BON)
+    print(plot_20bon)
 
     dev.off()
 
     png(filename = name_60BON_plot, width = 1200, height = 1200, units = "px",
         bg = "transparent")
 
-    print(Plot_60BON)
+    print(plot_60bon)
 
     dev.off()
 
@@ -275,28 +295,32 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
 
 
-      rza_plot <- ggplot()+
-        geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
-        geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
-        coord_sf(xlim = region_xlim, ylim = region_ylim)+
-        geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                   show.legend = TRUE,
+      rza_plot <- ggplot2::ggplot()+
+        ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
+        ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
+        ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
+        ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)),
+                            size = 6, show.legend = TRUE,
                    data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 > 0))+
-        geom_point(aes(LON,LAT), size = 4, shape = 4,
+        ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
                    data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 == 0))+
-        scale_color_viridis(option = "viridis", name = expression(paste("# ","m"^"-3")),
+        viridis::scale_color_viridis(option = "viridis",
+                                     name = expression(paste("# ","m"^"-3")),
                             breaks = taxa_breaks,
                             labels = format(signif(10^taxa_breaks, digits = 1),
                                      scientific = FALSE, trim = TRUE))+
-        scale_x_continuous(breaks = seq(region_xlim[1],(region_xlim[2] - 2), by = 4))+
-        scale_y_continuous(breaks = seq(region_ylim[1],region_ylim[2], by = 2))+
-        ggtitle(label = RZA_taxa_names[names(RZA_taxa_names) == rza_taxa[i]])+
-        xlab(label = "Longitude")+
-        ylab(label = "Latitude")+
-        theme_bw()+
-        theme(
+        ggplot2::scale_x_continuous(breaks = seq(region_xlim[1],
+                                                 (region_xlim[2] - 2), by = 4))+
+        ggplot2::scale_y_continuous(breaks = seq(region_ylim[1],
+                                                 region_ylim[2], by = 2))+
+        ggplot2::ggtitle(
+          label = rza_taxa_names[names(rza_taxa_names) == rza_taxa[i]])+
+        ggplot2::xlab(label = "Longitude")+
+        ggplot2::ylab(label = "Latitude")+
+        ggplot2::theme_bw()+
+        ggplot2::theme(
           title = element_text(face = "bold", size = 16),
           axis.text.y = element_text(face = "bold", size = 12),
           axis.text.x = element_text(face = "bold", size = 12),
