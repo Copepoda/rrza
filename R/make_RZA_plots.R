@@ -236,6 +236,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
   } else {
 
+# Individual plots-------------------------------------------------------------
     rza_taxa <- unique(rza$RZA_TAXA)
 
     for(i in 1:length(rza_taxa)){
@@ -254,6 +255,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
                       taxa_breaks <- seq(from = -1,to = 1, by = 1)
 
+                    }else if(abs(diff(breaks)) == 0){
+
+                      taxa_breaks <- seq(from = breaks[1] - 1,
+                                         to = breaks[2] + 1, by = 1 )
+
                     }else if(abs(diff(breaks)) > 1){
 
                       taxa_breaks <- seq(from = breaks[1],to = breaks[2], by = 1)
@@ -269,13 +275,14 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
         ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
         ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
+        ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
+                            show.legend = TRUE,
+                            data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
+                              filter(EST_NUM_PERM3 == 0))+
         ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)),
                             size = 6, show.legend = TRUE,
                    data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 > 0))+
-        ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
-                   data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
-                     filter(EST_NUM_PERM3 == 0))+
         viridis::scale_color_viridis(option = "viridis",
                                      name = expression(paste("# ","m"^"-3")),
                             breaks = taxa_breaks,
