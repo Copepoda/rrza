@@ -4,7 +4,9 @@
 #' and 500 micron mesh. The maps plot the log abundance per cubic meter of the
 #' rza taxa for each station. The map regions are standardized for each of the
 #' major cruises/grids for EcoFOCI.
-#' @param RZA An .xlxs dataframe formated specifically for entry of RZA data.
+#' @param rza_path The path to the directory where the .xlxs rza dataframe
+#' is located along with the .xlxs file name. This is a dataframe specifically
+#' formated for rza data entry.
 #' @param region There are six geographic regions which produce standardized
 #' maps. The six standardized maps can be set to Arctic, Northern BS, 70 meter,
 #' BASIS, GOA, and MACE 2018.
@@ -12,99 +14,98 @@
 #' function will produce two sets of faceted maps. One of the 60 bongo rza
 #' taxa and one of the 20 bongo rza taxa. When facets is set to FALSE the
 #' function will produce a map for each rza taxa.
-#' @param Year_folder The name of the year folder where the rza dataframe
-#' is located.
-#' @param Cruise_folder The name of the cruise folder where the rza
-#' dataframe is located.
+#' @return Either faceted maps or individual maps of rza taxa abundance.
 
 
+make_rza_plots <- function(rza_path, region, facets = TRUE){
 
+# reads in the first sheet in the .xlxs rza sheet------------------------------
+  rza <- readxl::read_excel(rza_path,sheet = 1)
 
-make_rza_plots <- function(RZA,region,facets = TRUE,Year_folder,Cruise_folder){
+# removes NA or non entererd beaker volumes to avoid function errors-----------
+  rza <- rza %>% dplyr::filter(!is.na(BEAKER_VOLUME))
 
-  #Read in the file. This function accepts an .xlxs. Only need to give the file name
-  #in quotes.
-  rza_path <- paste("G:/Rapid Zooplankton Assessment",
-                    Year_folder, Cruise_folder,RZA, sep = "/")
+# Latitude and longitude need to be in decimal degrees. Figures out if that is
+# already the case and will convert if it is necessary.------------------------
 
-  #This will clean out all the NA's, using beaker voulume column since beaker volume
-  #must be entered. Huge block's of NA's occur due to left over copy pastes of RZA_TAXA
-  #blocks. We will need to have the data sheet labeled in the same way, since sheet = 1
-  #is problematic. Maybe sheet = "RZA data" .
-  RZA <- read_excel(rza_path,sheet = 1)
-
-
-  RZA <- RZA %>% filter(!is.na(BEAKER_VOLUME))
-
-  #Convert the lat and long from degrees/minutes/seconds to decimal degrees, if the
-  #LAT and LON columns need converting
-
-  if(class(RZA$LON) == "character"){
-  RZA <- RZA %>%
-    mutate(LAT = conv_unit(LAT, from = 'deg_dec_min', to = 'dec_deg'))%>%
-    mutate(LON = conv_unit(LON, from = 'deg_dec_min', to = 'dec_deg'))%>%
-    mutate(LAT = as.numeric(LAT))%>%
-    mutate(LON = as.numeric(LON))
+   if(class(rza$LON) == "character"){
+     rza <- rza %>%
+        dplyr::mutate(LAT = measurements::conv_unit(LAT,
+                                                from = 'deg_dec_min',
+                                                to = 'dec_deg'))%>%
+        dplyr::mutate(LON = measurements::conv_unit(LON,
+                                                from = 'deg_dec_min',
+                                                to = 'dec_deg'))%>%
+        dplyr::mutate(LAT = as.numeric(LAT))%>%
+        dplyr::mutate(LON = as.numeric(LON))
   } else {
-    RZA
+    rza
   }
 
-  #Bring in the shape files for the Alaska region
-  MAP <- st_read(dsn = "G:/Rapid Zooplankton Assessment/RZA R Scripts/RZA Mapping Script/Shape_files_Alaska_dcw",
-                 layer = "Alaska_dcw_polygon_Project")
+# Bring in shape files from extdata within package and correct projection------
+  map <- sf::st_read(dsn = "inst/extdata",
+                     layer = "Alaska_dcw_polygon_Project",
+                     quiet = TRUE)%>%
+    sf::st_transform(., "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 
-  #Tranform into WGS84 coordinate system
-  MAP <- st_transform(MAP, "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+# Bring in 200 meter isobath and corrects projection---------------------------
+  bath_200m <- sf::st_read(dsn = "inst/extdata",
+                      layer = "ne_10m_bathymetry_K_200",
+                      quiet = TRUE)%>%
+    sf::st_transform(., "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
 
-  #200 meter bathymetery contour
-  BATH_200 <- st_read(dsn = "G:/Rapid Zooplankton Assessment/RZA R Scripts/RZA Mapping Script/Bathy_200_m",
-                      layer = "ne_10m_bathymetry_K_200")
-  BATH_200 <- st_transform(BATH_200, "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+# Defines the latitudinal limits for each region------------------------------
+  ar_xlim <- c(-170,-153)#Arctic
+  bs_xlim <- c(-174,-159)#BASIS Grid
+  ga_xlim <- c(-168,-148)#GOA
+  is_xlim <- c(-176,-160)#70 meter isobath
+  nb_xlim <- c(-172,-163)#Northern Bering Sea
+  mace2018_xlim <- c(-180,-170)#MACE2018 Survey
 
-  #Coordinate limits for each of the three areas
-  Ar_xlim <- c(-170,-153)#Arctic
-  BS_xlim <- c(-174,-159)#BASIS Grid
-  GA_xlim <- c(-168,-148)#GOA
-  IS_xlim <- c(-176,-160)#70 meter isobath
-  NB_xlim <- c(-172,-163)#Northern Bering Sea
-  MACE2018_xlim <- c(-180,-170)#MACE2018 Survey
-
+# Determines which xlim will be used based on user input-----------------------
   region_xlim <- if(region == "Arctic"){
-    Ar_xlim
+    ar_xlim
   } else if (region == "BASIS"){
-    BS_xlim
+    bs_xlim
   } else if (region == "70 meter"){
-    IS_xlim
+    is_xlim
   } else if (region == "Northern BS"){
-    NB_xlim
+    nb_xlim
   } else if (region == "MACE 2018"){
-    MACE2018_xlim
-  }  else {GA_xlim} #Where region == "Gulf of Alaska"
+    mace2018_xlim
+  } else if (region == "GOA"){
+    ga_xlim
+  } else {
+    stop(paste("The region",region,"is not an option. The choices are
+                  Arctic, Northern BS, 70 meter, BASIS, GOA, and MACE 2018."))
+  }
 
-  Ar_ylim <- c(66,73)#Arctic
-  BS_ylim <- c(54,60)#BASIS Grid
-  GA_ylim <- c(52,60)#GOA
-  IS_ylim <- c(53,63)#70 meter isobath
-  NB_ylim <- c(59,66)#Northern Bering Sea
-  MACE2018_ylim <- c(58,62)#MACE2018 Survey
+# Defines the longitudinal limits for each region------------------------------
+  ar_ylim <- c(66,73)#Arctic
+  bs_ylim <- c(54,60)#BASIS Grid
+  ga_ylim <- c(52,60)#GOA
+  is_ylim <- c(53,63)#70 meter isobath
+  nb_ylim <- c(59,66)#Northern Bering Sea
+  mace2018_ylim <- c(58,62)#MACE2018 Survey
 
+# Determines which ylim will be used based on user input-----------------------
   region_ylim <-  if(region == "Arctic"){
-    Ar_ylim
+    ar_ylim
   } else if (region == "BASIS"){
-    BS_ylim
+    bs_ylim
   } else if (region == "70 meter"){
-    IS_ylim
+    is_ylim
   } else if (region == "Northern BS"){
-    NB_ylim
+    nb_ylim
   } else if (region == "MACE 2018"){
-    MACE2018_ylim
-  } else {GA_ylim} #Where region == "Gulf of Alaska"
+    mace2018_ylim
+  } else if (region == "GOA"){
+    ga_xlim
+  }
 
-  ######
 
-  #Taxa names for labels
-
-  RZA_taxa_names <- c('Euphausiids_GT15' = "Euphausiids > 15mm",
+# Makes nice names for the plots-----------------------------------------------
+  rza_taxa_names <- c('Euphausiids_GT15' = "Euphausiids > 15mm",
                       'Copepods_GT2' = "Large Copepods",
                       'Euphausiids_LT15' = "Euphausiids < 15mm",
                       'Naked_Pteropods' = "Naked Snails",
@@ -117,30 +118,38 @@ make_rza_plots <- function(RZA,region,facets = TRUE,Year_folder,Cruise_folder){
                       'Other_20BON' = "Other small")
 
 
+# path to where the plots will be written--------------------------------------
+
+  plot_path <- paste(
+    cat(
+      unlist(stringr::str_split(
+        rza_path,"/"))[-length(stringr::str_count(
+          unlist(stringr::str_split(test_path,"/"))))], sep = "/"),
+    "Plots/", sep = "/")
+
+# name for each of the faceted plots-------------------------------------------
+  name_20BON_plot <- paste(plot_path,"RZA_",unique(rza$CRUISE),
+                           "_20BON.png", sep = "")
+  name_60BON_plot <- paste(plot_path,"RZA_",unique(rza$CRUISE),
+                           "_60BON.png", sep = "")
 
 
-  plot_path <- paste("G:/Rapid Zooplankton Assessment", Year_folder,"Plots/",sep = "/")
-
-  name_20BON_plot <- paste(plot_path,"RZA_",unique(RZA$CRUISE),"_20BON.png", sep = "")
-  name_60BON_plot <- paste(plot_path,"RZA_",unique(RZA$CRUISE),"_60BON.png", sep = "")
-
-
-
+#
   if(facets == TRUE){
 
-    breaks_20 <- as.integer(range(RZA %>% filter(GEAR_NAME == "20BON")%>%
+    breaks_20 <- as.integer(range(rza %>% filter(GEAR_NAME == "20BON")%>%
                                     filter(EST_NUM_PERM3 > 0)%>%
       collect %$% as.vector(log10(EST_NUM_PERM3)), na.rm = TRUE))
 
 
     Plot_20BON <- ggplot()+
-      geom_sf(color = "black", data = BATH_200[3], alpha = 0)+
-      geom_sf(fill ="#a7ad94", color = "black", data = MAP[1])+
+      geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
+      geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
       coord_sf(xlim = region_xlim, ylim = region_ylim)+
       geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                 data = RZA %>% filter(GEAR_NAME == "20BON") %>% filter(EST_NUM_PERM3 > 0))+
+                 data = rza %>% filter(GEAR_NAME == "20BON") %>% filter(EST_NUM_PERM3 > 0))+
       geom_point(aes(LON,LAT), size = 4, shape = 4,
-                 data = RZA %>% filter(GEAR_NAME == "20BON") %>% filter(EST_NUM_PERM3 == 0))+
+                 data = rza %>% filter(GEAR_NAME == "20BON") %>% filter(EST_NUM_PERM3 == 0))+
       scale_color_viridis(option = "viridis", name = expression(paste("# ","m"^"-3")),
                           breaks = c(seq(from = breaks_20[1], to = breaks_20[2], by = 1)),
                           labels = c(10^seq(from = breaks_20[1], to = breaks_20[2], by = 1)))+
@@ -160,18 +169,18 @@ make_rza_plots <- function(RZA,region,facets = TRUE,Year_folder,Cruise_folder){
       facet_wrap(~ RZA_TAXA,labeller = labeller(RZA_TAXA = RZA_taxa_names),nrow = 1)
 
 
-    breaks_60 <- as.integer(range(RZA %>% filter(GEAR_NAME == "60BON") %>%
+    breaks_60 <- as.integer(range(rza %>% filter(GEAR_NAME == "60BON") %>%
                                     filter(EST_NUM_PERM3 > 0)%>%
                                     collect %$% as.vector(log10(EST_NUM_PERM3)), na.rm = TRUE))
 
     Plot_60BON <- ggplot()+
-      geom_sf(color = "black", data = BATH_200[3], alpha = 0)+
-      geom_sf(fill ="#a7ad94", color = "black", data = MAP[1])+
+      geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
+      geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
       coord_sf(xlim = region_xlim, ylim = region_ylim)+
       geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                 data = RZA %>% filter(GEAR_NAME == "60BON") %>% filter(EST_NUM_PERM3 > 0))+
+                 data = rza %>% filter(GEAR_NAME == "60BON") %>% filter(EST_NUM_PERM3 > 0))+
       geom_point(aes(LON,LAT), size = 4, shape = 4,
-                 data = RZA %>% filter(GEAR_NAME == "60BON") %>% filter(EST_NUM_PERM3 == 0))+
+                 data = rza %>% filter(GEAR_NAME == "60BON") %>% filter(EST_NUM_PERM3 == 0))+
       scale_color_viridis(option = "viridis", name = expression(paste("# ","m"^"-3")),
                           breaks = c(seq(from = breaks_60[1], to = breaks_60[2], by = 1)),
                           labels = c(10^seq(from = breaks_60[1], to = breaks_60[2], by = 1)))+
@@ -207,11 +216,11 @@ make_rza_plots <- function(RZA,region,facets = TRUE,Year_folder,Cruise_folder){
 
   } else {
 
-    rza_taxa <- unique(RZA$RZA_TAXA)
+    rza_taxa <- unique(rza$RZA_TAXA)
 
     for(i in 1:length(rza_taxa)){
 
-      name_taxa_plot <- paste(plot_path,"RZA_",unique(RZA$CRUISE), "_",
+      name_taxa_plot <- paste(plot_path,"RZA_",unique(rza$CRUISE), "_",
                               rza_taxa[i], ".png", sep = "")
 
       #For TESTING###
@@ -245,12 +254,12 @@ make_rza_plots <- function(RZA,region,facets = TRUE,Year_folder,Cruise_folder){
       png(filename = name_taxa_plot, width = 400, height = 400, units = "px",
           bg = "transparent")
 
-      breaks <- as.integer(range(RZA %>% filter(RZA_TAXA == rza_taxa[i])%>%
+      breaks <- as.integer(range(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                                         filter(EST_NUM_PERM3 > 0)%>%
                                         collect %$% as.vector(log10(EST_NUM_PERM3)),
                                       na.rm = TRUE))
 
-      taxa_breaks <- if(sum(RZA %>% filter(RZA_TAXA == rza_taxa[i])%>%
+      taxa_breaks <- if(sum(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                             collect %$% as.vector(EST_NUM_PERM3),na.rm = TRUE) == 0){
 
                       taxa_breaks <- seq(from = -1,to = 1, by = 1)
@@ -267,15 +276,15 @@ make_rza_plots <- function(RZA,region,facets = TRUE,Year_folder,Cruise_folder){
 
 
       rza_plot <- ggplot()+
-        geom_sf(color = "black", data = BATH_200[3], alpha = 0)+
-        geom_sf(fill ="#a7ad94", color = "black", data = MAP[1])+
+        geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
+        geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
         coord_sf(xlim = region_xlim, ylim = region_ylim)+
         geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
                    show.legend = TRUE,
-                   data = RZA %>% filter(RZA_TAXA == rza_taxa[i])%>%
+                   data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 > 0))+
         geom_point(aes(LON,LAT), size = 4, shape = 4,
-                   data = RZA %>% filter(RZA_TAXA == rza_taxa[i])%>%
+                   data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 == 0))+
         scale_color_viridis(option = "viridis", name = expression(paste("# ","m"^"-3")),
                             breaks = taxa_breaks,
