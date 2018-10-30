@@ -28,7 +28,7 @@ Download the package as a tar.gz.
 
 ``` r
 
-install.packages("path/rza.tar.gz", type = "source", repos = NULL)
+install.packages("download/path/to/rza.tar.gz", type = "source", repos = NULL)
 ```
 
 After you have installed it this way, you can use

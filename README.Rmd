@@ -39,7 +39,7 @@ Download the package as a tar.gz.
 
 ```{r, eval = FALSE}
 
-install.packages("path/rza.tar.gz", type = "source", repos = NULL)
+install.packages("download/path/to/rza.tar.gz", type = "source", repos = NULL)
 
 ```
 
