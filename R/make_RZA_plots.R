@@ -174,7 +174,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         legend.text = element_text(face = "bold", size = 16),
         strip.background = element_blank())+
       ggplot2::facet_wrap(~ RZA_TAXA,
-                          labeller = labeller(RZA_TAXA = RZA_taxa_names),
+                          labeller = labeller(RZA_TAXA = rza_taxa_names),
                           nrow = 1)
 
 
@@ -216,7 +216,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         legend.text = element_text(face = "bold", size = 16),
         strip.background = element_blank())+
       ggplot2::facet_wrap(~RZA_TAXA,
-                          labeller = labeller(RZA_TAXA = RZA_taxa_names),
+                          labeller = labeller(RZA_TAXA = rza_taxa_names),
                           nrow = 3)
 
 
@@ -251,21 +251,40 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
                                       na.rm = TRUE)
 
       taxa_breaks <- if(sum(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
-                            collect %$% as.vector(EST_NUM_PERM3),na.rm = TRUE) == 0){
+                            collect %$% as.vector(EST_NUM_PERM3),
+                            na.rm = TRUE) == 0){
 
-                      taxa_breaks <- seq(from = -1,to = 1, by = 1)
+                      seq(from = -1,to = 1, by = 1)
 
                     }else if(abs(diff(breaks)) == 0){
 
-                      taxa_breaks <- breaks[1]
+                      breaks[1]
 
-                    }else if(abs(diff(breaks)) > 1){
+                    }else if(abs(diff(breaks)) > 0 & abs(diff(breaks)) < 0.5){
 
-                      taxa_breaks <- seq(from = breaks[1],to = breaks[2], by = 1)
+                      seq(from = breaks[1],to = breaks[2], by = 0.1)
 
-                    }else if(abs(diff(breaks)) == 1){
-                      taxa_breaks <- seq(from = breaks[1],to = breaks[2], by = 0.5)
-                  }
+                    }else if(abs(diff(breaks)) >= 0.5 & abs(diff(breaks)) < 1){
+
+                      seq(from = breaks[1],to = breaks[2], by = 0.25)
+
+                    }else if(abs(diff(breaks)) >= 1 & abs(diff(breaks)) < 2){
+
+                      seq(from = breaks[1],to = breaks[2], by = 0.5)
+
+                    }else if(abs(diff(breaks)) >= 2 & abs(diff(breaks)) < 3){
+
+                      seq(from = breaks[1],to = breaks[2], by = 0.75)
+
+                    }else if(abs(diff(breaks)) >= 3 & abs(diff(breaks)) < 4){
+
+                      seq(from = breaks[1],to = breaks[2], by = 1)
+
+                    }else if(abs(diff(breaks)) >= 4){
+
+                      seq(from = breaks[1],to = breaks[2], by = 2)
+
+                    }
 
 
 
@@ -285,7 +304,8 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         ggplot2::scale_color_viridis_c(option = "viridis",
                                      name = expression(paste("# ","m"^"-3")),
                             breaks = taxa_breaks,
-                            labels = signif(10^taxa_breaks, digits = 1)
+                            labels = format(signif(10^taxa_breaks, digits = 1),
+                                            scientific = FALSE, trim = TRUE)
                             )+
         ggplot2::scale_x_continuous(breaks = seq(region_xlim[1],
                                                  (region_xlim[2] - 2), by = 4))+
