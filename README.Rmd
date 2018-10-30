@@ -35,7 +35,7 @@ There are two options for installing the package.
 
 ### download/clone
 
-Download the package as a zip. 
+Download the package as a tar.gz. 
 
 ```{r, eval = FALSE}
 
