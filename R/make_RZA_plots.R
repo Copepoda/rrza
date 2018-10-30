@@ -1,7 +1,7 @@
 #' @title Abundance Maps for Rapid Zooplankton Assesment taxa.
 #' @description This function takes an RZA .xlxs dataframe and will make either
 #' individual plots of each RZA taxa group or two faceted maps based on 150
-#' and 500 micron mesh. The maps plot the log abundance per cubic meter of the
+#' and 500 micron mesh. The maps plot abundance per cubic meter of the
 #' rza taxa for each station. The map regions are standardized for each of the
 #' major cruises/grids for EcoFOCI.
 #' @param rza_path The path to the directory where the .xlxs rza dataframe
