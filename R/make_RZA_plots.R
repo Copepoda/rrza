@@ -120,12 +120,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
 # path to where the plots will be written--------------------------------------
 
-  plot_path <- paste(
-    cat(
-      unlist(stringr::str_split(
-        rza_path,"/"))[-length(stringr::str_count(
-          unlist(stringr::str_split(test_path,"/"))))], sep = "/"),
-    "Plots/", sep = "/")
+  folder_path <- stringr::str_c(unlist(stringr::str_split(
+      rza_path,"/"))[-length(stringr::str_count(
+        unlist(stringr::str_split(rza_path,"/"))))], collapse = "/")
+
+  plot_path <- paste(folder_path, "Plots/", sep = "/")
 
 # name for each of the faceted plots-------------------------------------------
   name_20BON_plot <- paste(plot_path,"RZA_",unique(rza$CRUISE),
