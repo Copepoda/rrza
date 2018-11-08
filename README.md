@@ -54,7 +54,7 @@ library(git2r)
 library(getPass)
 
 creds <- git2r::cred_ssh_key(publickey = fs::path_home(".ssh/id_rsa.pub"),
-                             privatekey = fs::path_home(".ssh/id_rsa")
+                             privatekey = fs::path_home(".ssh/id_rsa"),
                              passphrase = character(0))
 ```
 
