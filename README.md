@@ -53,8 +53,8 @@ needed to access the package.
 library(git2r)
 library(getPass)
 
-creds <- git2r::cred_ssh_key(publickey = ssh_path("id_rsa.pub"),
-                             privatekey = ssh_path("id_rsa"),
+creds <- git2r::cred_ssh_key(publickey = fs::path_home(".ssh/id_rsa.pub"),
+                             privatekey = fs::path_home(".ssh/id_rsa")
                              passphrase = character(0))
 ```
 
