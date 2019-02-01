@@ -118,14 +118,22 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
                       'Other_20BON' = "Other small")
 
 
+# Check for plot folder and make if it doesn't exist---------------------------
+
+  if(dir.exists(paste(rza_path,"/plots",sep = "")) == FALSE){
+
+    dir.create(paste(rza_path,"/plots",sep = ""))
+  }
+
 # path to where the plots will be written--------------------------------------
+
 
   remove <- length(stringr::str_count(unlist(stringr::str_split(rza_path,"/"))))
 
   folder_path <- stringr::str_c(unlist(stringr::str_split(
       rza_path,"/"))[-c(remove -1, remove)], collapse = "/")
 
-  plot_path <- paste(folder_path, "Plots/", sep = "/")
+  plot_path <- paste(folder_path, "plots/", sep = "/")
 
 # name for each of the faceted plots-------------------------------------------
   name_20BON_plot <- paste(plot_path,"RZA_",unique(rza$CRUISE),
@@ -146,10 +154,10 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
       ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
       ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
-      ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
+      ggplot2::geom_point(ggplot2::aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
                  data = rza %>% filter(GEAR_NAME == "20BON") %>%
                    filter(EST_NUM_PERM3 > 0))+
-      ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
+      ggplot2::geom_point(ggplot2::aes(LON,LAT), size = 4, shape = 4,
                  data = rza %>% filter(GEAR_NAME == "20BON") %>%
                    filter(EST_NUM_PERM3 == 0))+
       viridis::scale_color_viridis(option = "viridis",
@@ -166,13 +174,13 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       ggplot2::xlab(label = "Longitude")+
       ggplot2::ylab(label = "Latitude")+
       ggplot2::theme(
-        axis.text.y = element_text(face = "bold", size = 12),
-        axis.text.x = element_text(face = "bold", size = 12),
-        axis.title = element_text(face = "bold", size = 18),
-        strip.text = element_text(face = "bold", size = 18),
-        legend.title = element_text(face = "bold",size = 16),
-        legend.text = element_text(face = "bold", size = 16),
-        strip.background = element_blank())+
+        axis.text.y = ggplot2::element_text(face = "bold", size = 12),
+        axis.text.x = ggplot2::element_text(face = "bold", size = 12),
+        axis.title = ggplot2::element_text(face = "bold", size = 18),
+        strip.text = ggplot2::element_text(face = "bold", size = 18),
+        legend.title = ggplot2::element_text(face = "bold",size = 16),
+        legend.text = ggplot2::element_text(face = "bold", size = 16),
+        strip.background = ggplot2::element_blank())+
       ggplot2::facet_wrap(~ RZA_TAXA,
                           labeller = labeller(RZA_TAXA = rza_taxa_names),
                           nrow = 1)
@@ -188,10 +196,10 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
       ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
       ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
-      ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
+      ggplot2::geom_point(ggplot2::aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
                  data = rza %>% filter(GEAR_NAME == "60BON") %>%
                    filter(EST_NUM_PERM3 > 0))+
-      ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
+      ggplot2::geom_point(ggplot2::aes(LON,LAT), size = 4, shape = 4,
                  data = rza %>% filter(GEAR_NAME == "60BON") %>%
                    filter(EST_NUM_PERM3 == 0))+
       viridis::scale_color_viridis(option = "viridis",
@@ -208,13 +216,13 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       ggplot2::xlab(label = "Longitude")+
       ggplot2::ylab(label = "Latitude")+
       ggplot2::theme(
-        axis.text.y = element_text(face = "bold", size = 12),
-        axis.text.x = element_text(face = "bold", size = 12),
-        axis.title = element_text(face = "bold", size = 18),
-        strip.text = element_text(face = "bold", size = 18),
-        legend.title = element_text(face = "bold",size = 16),
-        legend.text = element_text(face = "bold", size = 16),
-        strip.background = element_blank())+
+        axis.text.y = ggplot2::element_text(face = "bold", size = 12),
+        axis.text.x = ggplot2::element_text(face = "bold", size = 12),
+        axis.title = ggplot2::element_text(face = "bold", size = 18),
+        strip.text = ggplot2::element_text(face = "bold", size = 18),
+        legend.title = ggplot2::element_text(face = "bold",size = 16),
+        legend.text = ggplot2::element_text(face = "bold", size = 16),
+        strip.background = ggplot2::element_blank())+
       ggplot2::facet_wrap(~RZA_TAXA,
                           labeller = labeller(RZA_TAXA = rza_taxa_names),
                           nrow = 3)
@@ -293,11 +301,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         ggplot2::geom_sf(color = "black", data = bath_200m[3], alpha = 0)+
         ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
         ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
-        ggplot2::geom_point(aes(LON,LAT), size = 4, shape = 4,
+        ggplot2::geom_point(ggplot2::aes(LON,LAT), size = 4, shape = 4,
                             show.legend = TRUE,
                             data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                               filter(EST_NUM_PERM3 == 0))+
-        ggplot2::geom_point(aes(LON,LAT, color = log10(EST_NUM_PERM3)),
+        ggplot2::geom_point(ggplot2::aes(LON,LAT, color = log10(EST_NUM_PERM3)),
                             size = 6, show.legend = TRUE,
                    data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
                      filter(EST_NUM_PERM3 > 0))+
@@ -317,13 +325,13 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         ggplot2::ylab(label = "Latitude")+
         ggplot2::theme_bw()+
         ggplot2::theme(
-          title = element_text(face = "bold", size = 16),
-          axis.text.y = element_text(face = "bold", size = 12),
-          axis.text.x = element_text(face = "bold", size = 12),
-          axis.title = element_text(face = "bold", size = 16),
-          strip.text = element_text(face = "bold", size = 16),
-          legend.title = element_text(face = "bold",size = 16),
-          legend.text = element_text(face = "bold", size = 16),
+          title = ggplot2::element_text(face = "bold", size = 16),
+          axis.text.y = ggplot2::element_text(face = "bold", size = 12),
+          axis.text.x = ggplot2::element_text(face = "bold", size = 12),
+          axis.title = ggplot2::element_text(face = "bold", size = 16),
+          strip.text = ggplot2::element_text(face = "bold", size = 16),
+          legend.title = ggplot2::element_text(face = "bold",size = 16),
+          legend.text = ggplot2::element_text(face = "bold", size = 16),
           legend.position = "right",
           strip.background = element_blank())
 
