@@ -15,7 +15,8 @@
 #' taxa and one of the 20 bongo rza taxa. When facets is set to FALSE the
 #' function will produce a map for each rza taxa.
 #' @return Either faceted maps or individual maps of rza taxa abundance.
-
+#' @export make_rza_plots
+#' @name rrza
 
 make_rza_plots <- function(rza_path, region, facets = TRUE){
 
@@ -145,9 +146,9 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 #
   if(facets == TRUE){
 
-    breaks_20 <- as.integer(range(rza %>% filter(GEAR_NAME == "20BON")%>%
-                                    filter(EST_NUM_PERM3 > 0)%>%
-      collect %$% as.vector(log10(EST_NUM_PERM3)), na.rm = TRUE))
+    breaks_20 <- as.integer(range(rza %>% dplyr::filter(GEAR_NAME == "20BON")%>%
+                                    dplyr::filter(EST_NUM_PERM3 > 0)%>%
+      dplyr::collect %$% as.vector(log10(EST_NUM_PERM3)), na.rm = TRUE))
 
 
     plot_20bon <- ggplot2::ggplot()+
@@ -155,11 +156,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
       ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
       ggplot2::geom_point(ggplot2::aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                 data = rza %>% filter(GEAR_NAME == "20BON") %>%
-                   filter(EST_NUM_PERM3 > 0))+
+                 data = rza %>% dplyr::filter(GEAR_NAME == "20BON") %>%
+                   dplyr::filter(EST_NUM_PERM3 > 0))+
       ggplot2::geom_point(ggplot2::aes(LON,LAT), size = 4, shape = 4,
-                 data = rza %>% filter(GEAR_NAME == "20BON") %>%
-                   filter(EST_NUM_PERM3 == 0))+
+                 data = rza %>% dplyr::filter(GEAR_NAME == "20BON") %>%
+                   dplyr::filter(EST_NUM_PERM3 == 0))+
       viridis::scale_color_viridis(option = "viridis",
                                    name = expression(paste("# ","m"^"-3")),
                                    breaks = c(seq(from = breaks_20[1],
@@ -182,13 +183,13 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         legend.text = ggplot2::element_text(face = "bold", size = 16),
         strip.background = ggplot2::element_blank())+
       ggplot2::facet_wrap(~ RZA_TAXA,
-                          labeller = labeller(RZA_TAXA = rza_taxa_names),
+                          labeller = ggplot2::labeller(RZA_TAXA = rza_taxa_names),
                           nrow = 1)
 
 
-    breaks_60 <- as.integer(range(rza %>% filter(GEAR_NAME == "60BON") %>%
-                                    filter(EST_NUM_PERM3 > 0)%>%
-                                    collect %$%
+    breaks_60 <- as.integer(range(rza %>% dplyr::filter(GEAR_NAME == "60BON") %>%
+                                    dplyr::filter(EST_NUM_PERM3 > 0)%>%
+                                    dplyr::collect %$%
                                     as.vector(log10(EST_NUM_PERM3)),
                                     na.rm = TRUE))
 
@@ -197,11 +198,11 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
       ggplot2::geom_sf(fill ="#a7ad94", color = "black", data = map[1])+
       ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
       ggplot2::geom_point(ggplot2::aes(LON,LAT, color = log10(EST_NUM_PERM3)), size = 6,
-                 data = rza %>% filter(GEAR_NAME == "60BON") %>%
-                   filter(EST_NUM_PERM3 > 0))+
+                 data = rza %>% dplyr::filter(GEAR_NAME == "60BON") %>%
+                   dplyr::filter(EST_NUM_PERM3 > 0))+
       ggplot2::geom_point(ggplot2::aes(LON,LAT), size = 4, shape = 4,
-                 data = rza %>% filter(GEAR_NAME == "60BON") %>%
-                   filter(EST_NUM_PERM3 == 0))+
+                 data = rza %>% dplyr::filter(GEAR_NAME == "60BON") %>%
+                   dplyr::filter(EST_NUM_PERM3 == 0))+
       viridis::scale_color_viridis(option = "viridis",
                                    name = expression(paste("# ","m"^"-3")),
                           breaks = c(seq(from = breaks_60[1],
@@ -224,7 +225,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         legend.text = ggplot2::element_text(face = "bold", size = 16),
         strip.background = ggplot2::element_blank())+
       ggplot2::facet_wrap(~RZA_TAXA,
-                          labeller = labeller(RZA_TAXA = rza_taxa_names),
+                          labeller = ggplot2::labeller(RZA_TAXA = rza_taxa_names),
                           nrow = 3)
 
 
@@ -253,13 +254,13 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
                               rza_taxa[i], ".png", sep = "")
 
 
-      breaks <- range(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
-                                        filter(EST_NUM_PERM3 > 0)%>%
-                                        collect %$% as.vector(log10(EST_NUM_PERM3)),
+      breaks <- range(rza %>% dplyr::filter(RZA_TAXA == rza_taxa[i])%>%
+                                        dplyr::filter(EST_NUM_PERM3 > 0)%>%
+                                        dplyr::collect %$% as.vector(log10(EST_NUM_PERM3)),
                                       na.rm = TRUE)
 
-      taxa_breaks <- if(sum(rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
-                            collect %$% as.vector(EST_NUM_PERM3),
+      taxa_breaks <- if(sum(rza %>% dplyr::filter(RZA_TAXA == rza_taxa[i])%>%
+                            dplyr::collect %$% as.vector(EST_NUM_PERM3),
                             na.rm = TRUE) == 0){
 
                       seq(from = -1,to = 1, by = 1)
@@ -303,12 +304,12 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
         ggplot2::coord_sf(xlim = region_xlim, ylim = region_ylim)+
         ggplot2::geom_point(ggplot2::aes(LON,LAT), size = 4, shape = 4,
                             show.legend = TRUE,
-                            data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
-                              filter(EST_NUM_PERM3 == 0))+
+                            data = rza %>% dplyr::filter(RZA_TAXA == rza_taxa[i])%>%
+                              dplyr::filter(EST_NUM_PERM3 == 0))+
         ggplot2::geom_point(ggplot2::aes(LON,LAT, color = log10(EST_NUM_PERM3)),
                             size = 6, show.legend = TRUE,
-                   data = rza %>% filter(RZA_TAXA == rza_taxa[i])%>%
-                     filter(EST_NUM_PERM3 > 0))+
+                   data = rza %>% dplyr::filter(RZA_TAXA == rza_taxa[i])%>%
+                     dplyr::filter(EST_NUM_PERM3 > 0))+
         ggplot2::scale_color_viridis_c(option = "viridis",
                                      name = expression(paste("# ","m"^"-3")),
                             breaks = taxa_breaks,
@@ -333,7 +334,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
           legend.title = ggplot2::element_text(face = "bold",size = 16),
           legend.text = ggplot2::element_text(face = "bold", size = 16),
           legend.position = "right",
-          strip.background = element_blank())
+          strip.background = ggplot2::element_blank())
 
 
 
@@ -342,7 +343,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
       print(rza_plot)
 
-      dev.off()
+      greDevices::dev.off()
 
       }
   }
