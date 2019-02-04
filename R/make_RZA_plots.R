@@ -343,7 +343,7 @@ make_rza_plots <- function(rza_path, region, facets = TRUE){
 
       print(rza_plot)
 
-      greDevices::dev.off()
+      grDevices::dev.off()
 
       }
   }
