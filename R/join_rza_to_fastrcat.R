@@ -16,12 +16,12 @@
 #' meters and the bottom is defined as maximum tow depth to the 5 meters above.
 #' @return writes a new .csv file to the RZA folder of the linked data. Date/time
 #' and latitude/longitude returned will be from the fastrcat.
-#' @export join_rza_to_fasrtcat
+#' @export join_rza_to_fastrcat
 
 join_rza_to_fastrcat <- function(rza_path, fastrcat_path, depth_range = 5){
 
 # reads in the first sheet in the .xlxs rza sheet------------------------------
-  rza <- readxl::read_excel(rza_path,sheet = 1)%>%
+  rza <- readxl::read_excel(rza_path, sheet = 1)%>%
     dplyr::select(CRUISE, STATION_NAME, HAUL_ID, FOCI_GRID, GEAR_NAME, NET,
                   SORTER, JELLY_FOULING, PHYTOPLANKTON_FOULING, SAMPLE_COLOR,
                   BEAKER_VOLUME, SUBSAMPLE_VOLUME, RZA_TAXA, SUBSAMPLE_COUNT,
@@ -50,7 +50,7 @@ join_rza_to_fastrcat <- function(rza_path, fastrcat_path, depth_range = 5){
 
 # checks if the Cruises are the same-------------------------------------------
 
-  if(unique(rza$CRUISE) != unique(fastrcat$CRUISE)){
+  if(na.omit(unique(rza$CRUISE)) != na.omit(unique(fastrcat$CRUISE))){
     stop("Cruises don't match. Check file paths and make sure they are pointing
           to rza and fastrcat data from the same cruise")
   }
