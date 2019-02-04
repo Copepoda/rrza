@@ -1,68 +1,29 @@
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-rrza
-----
+# rrza
+An R package to create abundance maps for Rapid Zooplankton Assessment Data. 
 
-This function takes an RZA .xlxs dataframe and will make either
-individual plots of each RZA taxa group or two faceted maps based on 150
-and 500 micron mesh. The maps plot the log abundance per cubic meter of
-the rza taxa for each station. The map regions are standardized for each
-of the major cruises/grids for EcoFOCI.
+Disclaimer  
 
-documentation
+This repository is a scientific product and is not official communication of the Alaska Fisheries Science Center, the National Oceanic and Atmospheric Administration, or the United States Department of Commerce. All AFSC Resource Assesment and Conservation Engineering (AFSC-RACE) GitHub project code is provided on an ‘as is’ basis and the user assumes responsibility for its use. AFSC-RACE has relinquished control of the information and no longer has responsibility to protect the integrity, confidentiality, or availability of the information. Any claims against the Department of Commerce or Department of Commerce bureaus stemming from the use of this GitHub project will be governed by all applicable Federal law. Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by the Department of Commerce. The Department of Commerce seal and logo, or the seal and logo of a DOC bureau, shall not be used in any manner to imply endorsement of any commercial product or activity by DOC or the United States Government.
+
+
+Documentation
 -------------
 
-Full documentation of the process is available in vignettes
 
-How to install the package
---------------------------
-
-There are two options for installing the package.
-
-1.  download/clone the project from GitLab and then install to R from
-    source
-2.  install with the `devtools`, `git2r`, and, `getPass` packages
-
-### download/clone
-
-Download the package as a tar.gz.
+How to install the package from GitHub
+--------------------------------------
 
 ``` r
+install.packages(remotes)
 
-install.packages("download/path/to/rza.tar.gz", type = "source", repos = NULL)
+remotes::install_github("Copepoda/rrza", build = TRUE, 
+                        build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
-After you have installed it this way, you can use
+Load rrza
+-------------
 
 ``` r
 library(rrza)
 ```
 
-to load the library .
-
-### install directly from GitLab
-
-After you have setup your ssh on GitLab and added you ssh key. Copy and
-paste the code below to intall the `rrza` package.
-
-The package `git2r` creates the ssh credential path to tell GitLab you
-are allowed to access the repository. The package `getPass` creates the
-pop up prompt for you to enter your LDAP password. Both of these are
-needed to access the package.
-
-``` r
-library(git2r)
-library(getPass)
-
-creds <- git2r::cred_ssh_key(publickey = fs::path_home(".ssh/id_rsa.pub"),
-                             privatekey = fs::path_home(".ssh/id_rsa"),
-                             passphrase = getPass::getPass())
-```
-
-The package `devtools` is needed install the `rrza` package.
-
-``` r
-library(devtools)
-devtools::install_git("git@gitlab.afsc.noaa.gov:Nissa.Ferm/rrza.git",
-                      build_vignettes = TRUE,
-                      credentials = creds)
-```
