@@ -4,7 +4,7 @@ Title: Maps for the Rapid Zooplankton Assesment (RZA)
 Version: 0.0.09000
 Author: person(given = "Nissa", family = "Ferm", email = "nissa.ferm@noaa.gov",role = c("aut","cre"))
 Maintainer: Nissa Ferm <nissa.ferm@noaa.gov>
-Description: Produces individual maps or faceted maps for each taxa of the rza.
+Description: Produces individual maps or faceted maps for each taxa of the rza. Matches to FastrCAT data.
 Depends: R(>= 3.5.0)
 License: CC0
 Encoding: UTF-8
